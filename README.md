@@ -2,6 +2,8 @@
 
 Markdown-first **draft ingestion** for [EmDash](https://emdashcms.com): an npm-installable plugin plus an MCP server so **Cursor** and **Goose** can create `posts` drafts without publishing.
 
+**Source:** [https://github.com/EmPlugins/EmPost](https://github.com/EmPlugins/EmPost)
+
 ## Quick start
 
 ### I run an EmDash site

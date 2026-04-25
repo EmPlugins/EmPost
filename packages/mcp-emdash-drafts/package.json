@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/empost/empost.git",
+    "url": "https://github.com/EmPlugins/EmPost.git",
     "directory": "packages/mcp-emdash-drafts"
   },
   "keywords": [
