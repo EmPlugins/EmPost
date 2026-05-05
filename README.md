@@ -1,3 +1,4 @@
+![EmPost Logo](/artwork/logo/EmPost.png)
 # EmPost
 
 Markdown-first **draft ingestion** for [EmDash](https://emdashcms.com): an npm-installable plugin plus an MCP server so **Cursor** and **Goose** can create `posts` drafts without publishing.
