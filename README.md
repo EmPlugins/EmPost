@@ -39,7 +39,7 @@ Add the MCP server to Cursor or Goose with env vars `EMDASH_INGEST_URL`, `EMDASH
 
 ## Compatibility
 
-Tested against **EmDash `0.7.x`**. Ingest uses `POST` with `Content-Type: application/json` and `{ "markdown": "..." }` because EmDash’s plugin route host parses JSON before the handler runs (see [`docs/operator-runbook.md`](./docs/operator-runbook.md)).
+Tested against **EmDash `0.9.x` and later** (`emdash` peer **`>=0.9.0`** on `@emplugins/emdash-plugin-md-draft`). Ingest uses `POST` with `Content-Type: application/json` and `{ "markdown": "..." }` because EmDash’s plugin route host parses JSON before the handler runs (see [`docs/operator-runbook.md`](./docs/operator-runbook.md)).
 
 ## License
 

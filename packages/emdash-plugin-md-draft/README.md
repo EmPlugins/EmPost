@@ -8,7 +8,7 @@ EmDash **native** plugin that exposes authenticated HTTP routes to create **`pos
 pnpm add @emplugins/emdash-plugin-md-draft
 ```
 
-Peer: **`emdash` `^0.7.0`**.
+Peer: **`emdash` `>=0.9.0`**.
 
 ## Register (Astro)
 

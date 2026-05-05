@@ -17,6 +17,7 @@ import {
 	timingSafeEqualHex,
 } from "@emplugins/shared";
 import { definePlugin, PluginRouteError, type PluginContext, type RouteContext } from "emdash";
+import { mapContentCreateError } from "./map-content-create-error.js";
 
 async function numSetting(ctx: PluginContext, key: string, fallback: number): Promise<number> {
 	const v = await ctx.kv.get<number>(`settings:${key}`);
@@ -171,7 +172,7 @@ async function ingestHandler(ctx: RouteContext) {
 	const { blocks } = markdownToPortableTextBlocks(doc.body, conversionMs);
 
 	if (!ctx.content?.create) {
-		throw PluginRouteError.internal("write:content unavailable");
+		throw PluginRouteError.internal("content:write unavailable");
 	}
 
 	const baseSlug = doc.frontmatter.slug ?? slugFromTitle(doc.frontmatter.title);
@@ -205,8 +206,7 @@ async function ingestHandler(ctx: RouteContext) {
 	try {
 		item = await ctx.content.create(doc.frontmatter.collection, write);
 	} catch (e) {
-		ctx.log.error("content.create failed", { err: String(e) });
-		throw PluginRouteError.badRequest("Could not create draft");
+		mapContentCreateError(e, ctx.log);
 	}
 
 	await kvSetBestEffort(ctx, dMinKey, curMin + 1, 2 * 60_000);
@@ -241,7 +241,7 @@ export function createPlugin(_options: Record<string, unknown> = {}) {
 	return definePlugin({
 		id: "empost-md-draft",
 		version: "0.1.0",
-		capabilities: ["write:content"],
+		capabilities: ["content:write"],
 		admin: {
 			settingsSchema: {
 				hmacSecret: {

@@ -2,8 +2,10 @@
 
 ## Prerequisites
 
-- EmDash **0.7.x** site with the `posts` collection (default Markdown → Portable Text field `content`).
+- EmDash **0.9.x or later** site with the `posts` collection (default Markdown → Portable Text field `content`).
 - Ability to add a **native** plugin to `astro.config` (`plugins: []`).
+
+EmDash **0.9.x** also introduces site-wide secrets handling: installs typically get an **`EMDASH_ENCRYPTION_KEY`** in `.dev.vars` / `.env` (or generate one with `emdash secrets generate`). **`EMDASH_AUTH_SECRET`** is legacy as an IP-salt fallback for upgrades—new installs do not need to set it for EmPost.
 
 ## Install plugin
 
@@ -66,4 +68,5 @@ The HMAC covers `sha256(utf8(JSON.stringify({markdown})))` after the same valida
 | 503 NOT_CONFIGURED | Signing secret missing or too short in admin. |
 | 401 | Clock skew, wrong secret, bad `keyId`, reused nonce, or signature/path mismatch. |
 | 403 Rate limited / quota | Per-IP or per-key limits in plugin settings. |
-| 400 Could not create draft | Collection/schema mismatch (e.g. SEO on a collection without SEO). |
+| 400 `VALIDATION_ERROR` / `CREATE_FAILED` / `NOT_FOUND` | EmDash rejected the payload (required fields, invalid SEO on this collection, bad reference, etc.). Response includes structured `details` when provided by EmDash. |
+| 409 `SLUG_CONFLICT` / `CONFLICT` | Slug already in use or other conflict from EmDash. |
