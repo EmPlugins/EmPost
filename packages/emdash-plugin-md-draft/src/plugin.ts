@@ -176,9 +176,12 @@ async function ingestHandler(ctx: RouteContext) {
 	}
 
 	const baseSlug = doc.frontmatter.slug ?? slugFromTitle(doc.frontmatter.title);
+	const locale = doc.frontmatter.locale;
 	let slug = baseSlug;
 	for (let attempt = 0; attempt < 8; attempt++) {
-		const list = await ctx.content.list(doc.frontmatter.collection, { limit: 50 });
+		const listOptions: { limit: number; where?: { locale: string } } = { limit: 50 };
+		if (locale) listOptions.where = { locale };
+		const list = await ctx.content.list(doc.frontmatter.collection, listOptions);
 		const taken = list.items.some((it) => it.slug === slug);
 		if (!taken) break;
 		slug = `${baseSlug}-${attempt + 2}`;
@@ -190,6 +193,8 @@ async function ingestHandler(ctx: RouteContext) {
 		status: "draft",
 		content: blocks,
 	};
+	if (locale) write.locale = locale;
+	if (doc.frontmatter.translationOf) write.translationOf = doc.frontmatter.translationOf;
 	if (doc.frontmatter.excerpt) write.excerpt = doc.frontmatter.excerpt;
 	if (doc.frontmatter.seo) write.seo = doc.frontmatter.seo;
 
@@ -226,6 +231,7 @@ async function ingestHandler(ctx: RouteContext) {
 		contentId,
 		slug,
 		collection: doc.frontmatter.collection,
+		...(locale ? { locale } : {}),
 		adminUrl: ctx.url(`/_emdash/admin`),
 	};
 }

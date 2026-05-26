@@ -38,6 +38,36 @@ status: published
 x`),
 		).toThrow(/draft/);
 	});
+
+	it("accepts optional locale", () => {
+		const doc = parseMarkdownDocument(`---
+title: "Bonjour"
+locale: fr
+---
+body`);
+		expect(doc.frontmatter.locale).toBe("fr");
+	});
+
+	it("requires locale when translationOf is set", () => {
+		expect(() =>
+			parseMarkdownDocument(`---
+title: T
+translationOf: 01JABCDEF
+---
+x`),
+		).toThrow(/locale/);
+	});
+
+	it("accepts translationOf with locale", () => {
+		const doc = parseMarkdownDocument(`---
+title: T
+locale: fr
+translationOf: 01JABCDEF
+---
+x`);
+		expect(doc.frontmatter.locale).toBe("fr");
+		expect(doc.frontmatter.translationOf).toBe("01JABCDEF");
+	});
 });
 
 describe("HMAC", () => {

@@ -2,10 +2,10 @@
 
 ## Prerequisites
 
-- EmDash **0.9.x or later** site with the `posts` collection (default Markdown → Portable Text field `content`).
+- EmDash **0.14.x or later** site with the `posts` collection (default Markdown → Portable Text field `content`).
 - Ability to add a **native** plugin to `astro.config` (`plugins: []`).
 
-EmDash **0.9.x** also introduces site-wide secrets handling: installs typically get an **`EMDASH_ENCRYPTION_KEY`** in `.dev.vars` / `.env` (or generate one with `emdash secrets generate`). **`EMDASH_AUTH_SECRET`** is legacy as an IP-salt fallback for upgrades—new installs do not need to set it for EmPost.
+Site-wide secrets: installs typically get an **`EMDASH_ENCRYPTION_KEY`** in `.dev.vars` / `.env` (or generate one with `emdash secrets generate`). **`EMDASH_AUTH_SECRET`** is legacy as an IP-salt fallback for upgrades from older EmDash—new installs do not need it for EmPost.
 
 ## Install plugin
 
@@ -50,6 +50,20 @@ Idempotency-Key: <optional>
 
 The HMAC covers `sha256(utf8(JSON.stringify({markdown})))` after the same validation the plugin applies (see `@emplugins/shared`).
 
+## Multilingual ingest (optional)
+
+When i18n is enabled on the site, authors may set locale in the markdown frontmatter:
+
+```yaml
+---
+title: "Bonjour"
+locale: fr
+translationOf: 01JXXXXXXXXXXXXXXX
+---
+```
+
+`translationOf` must be the id of an existing entry; `locale` is required when `translationOf` is set. Omit both for the site default locale. Slug de-duplication is scoped per locale.
+
 ## Rotate secret
 
 1. Set a new **HMAC signing secret** in admin.
@@ -68,5 +82,5 @@ The HMAC covers `sha256(utf8(JSON.stringify({markdown})))` after the same valida
 | 503 NOT_CONFIGURED | Signing secret missing or too short in admin. |
 | 401 | Clock skew, wrong secret, bad `keyId`, reused nonce, or signature/path mismatch. |
 | 403 Rate limited / quota | Per-IP or per-key limits in plugin settings. |
-| 400 `VALIDATION_ERROR` / `CREATE_FAILED` / `NOT_FOUND` | EmDash rejected the payload (required fields, invalid SEO on this collection, bad reference, etc.). Response includes structured `details` when provided by EmDash. |
+| 400 `VALIDATION_ERROR` / `CREATE_FAILED` / `NOT_FOUND` | EmDash rejected the payload (required fields, invalid SEO on this collection, bad `translationOf` id, invalid `seo.image` on strict image fields, etc.). Response includes structured `details` when provided by EmDash. |
 | 409 `SLUG_CONFLICT` / `CONFLICT` | Slug already in use or other conflict from EmDash. |
