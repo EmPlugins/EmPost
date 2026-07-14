@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://emplugins.dev/schemas/emdash-release.json",
+  "title": "EmDash release workflow config",
+  "description": "Per-repository config for the emdash-plugin-release Cursor skill.",
+  "type": "object",
+  "required": ["emdash", "publishablePackages"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional JSON Schema pointer (e.g. .cursor/emdash-release.schema.json)"
+    },
+    "repo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "github": {
+          "type": "string",
+          "description": "Expected GitHub repo slug (owner/name). Agent verifies git remote.",
+          "pattern": "^[^/]+/[^/]+$"
+        },
+        "baseBranch": {
+          "type": "string",
+          "default": "main"
+        }
+      }
+    },
+    "emdash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minPeerVersion", "pluginPackage"],
+      "properties": {
+        "minPeerVersion": {
+          "type": "string",
+          "description": "Minimum supported emdash peer (CI matrix floor).",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "pluginPackage": {
+          "type": "string",
+          "description": "npm package name with emdash devDependency (pnpm --filter target)."
+        },
+        "pluginPackageJson": {
+          "type": "string",
+          "description": "Path to plugin package.json (devDep + peerDep edits).",
+          "default": "package.json"
+        }
+      }
+    },
+    "publishablePackages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      },
+      "description": "npm packages included in compat changesets (must match .changeset/config.json linked/fixed groups)."
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "compatDoc": { "type": "string", "default": "EMDASH_COMPAT.md" },
+        "readme": { "type": "string", "default": "README.md" },
+        "ciWorkflow": { "type": "string", "default": ".github/workflows/ci.yml" },
+        "releaseWorkflow": { "type": "string", "default": ".github/workflows/release.yml" },
+        "conformanceScript": { "type": "string", "default": "scripts/emdash-conformance.sh" },
+        "maintainerDoc": { "type": "string", "default": "docs/maintainer-release.md" },
+        "releaseChecklist": { "type": "string", "default": "docs/release-checklist.md" },
+        "pluginSourceDir": { "type": "string", "description": "Primary plugin source for API fixes." }
+      }
+    },
+    "apiTouchpoints": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Files likely to break on emdash API changes (for non-conforming diagnosis)."
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "autoMergeCompatPr": {
+          "type": "boolean",
+          "default": true,
+          "description": "Agent auto-merges emdash/<version>-compat PR when CI is green."
+        },
+        "mergeVersionPackagesPr": {
+          "type": "boolean",
+          "default": false,
+          "description": "Agent must NOT merge Version Packages PR (user publish gate)."
+        }
+      }
+    }
+  }
+}

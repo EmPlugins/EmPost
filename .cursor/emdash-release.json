@@ -1,0 +1,35 @@
+{
+  "$schema": "./emdash-release.schema.json",
+  "repo": {
+    "github": "EmPlugins/EmPost",
+    "baseBranch": "main"
+  },
+  "emdash": {
+    "minPeerVersion": "0.14.0",
+    "pluginPackage": "@emplugins/emdash-plugin-md-draft",
+    "pluginPackageJson": "packages/emdash-plugin-md-draft/package.json"
+  },
+  "publishablePackages": [
+    "@emplugins/emdash-plugin-md-draft",
+    "@emplugins/mcp-emdash-drafts"
+  ],
+  "paths": {
+    "compatDoc": "EMDASH_COMPAT.md",
+    "readme": "README.md",
+    "ciWorkflow": ".github/workflows/ci.yml",
+    "releaseWorkflow": ".github/workflows/release.yml",
+    "conformanceScript": "scripts/emdash-conformance.sh",
+    "maintainerDoc": "docs/maintainer-release.md",
+    "releaseChecklist": "docs/release-checklist.md",
+    "pluginSourceDir": "packages/emdash-plugin-md-draft/src"
+  },
+  "apiTouchpoints": [
+    "packages/emdash-plugin-md-draft/src/plugin.ts",
+    "packages/emdash-plugin-md-draft/src/map-content-create-error.ts",
+    "packages/emdash-plugin-md-draft/src/index.ts"
+  ],
+  "approval": {
+    "autoMergeCompatPr": true,
+    "mergeVersionPackagesPr": false
+  }
+}
