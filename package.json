@@ -7,7 +7,8 @@
     "test": "pnpm -r run test",
     "lint": "pnpm -r run lint",
     "pack:check": "cd packages/emdash-plugin-md-draft && npm pack --dry-run && cd ../mcp-emdash-drafts && npm pack --dry-run",
-    "emdash:conformance": "bash scripts/emdash-conformance.sh"
+    "emdash:conformance": "bash scripts/emdash-conformance.sh",
+    "release:publish": "pnpm build && pnpm test && pnpm pack:check && pnpm -r publish --access public"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.11",
