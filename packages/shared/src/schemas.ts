@@ -16,6 +16,8 @@ export const frontmatterSchema = z
 		slug: z.string().min(1).optional(),
 		excerpt: z.string().optional(),
 		collection: z.string().min(1).default("posts"),
+		locale: z.string().min(2).max(16).optional(),
+		translationOf: z.string().min(1).optional(),
 		status: z.literal("draft").optional(),
 		tags: z.array(z.string()).optional(),
 		category: z.union([z.string(), z.array(z.string())]).optional(),
@@ -35,6 +37,13 @@ export const frontmatterSchema = z
 				code: z.ZodIssueCode.custom,
 				message: 'collection must be "posts" in v1',
 				path: ["collection"],
+			});
+		}
+		if (data.translationOf != null && data.locale == null) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: "locale is required when translationOf is set",
+				path: ["locale"],
 			});
 		}
 	});

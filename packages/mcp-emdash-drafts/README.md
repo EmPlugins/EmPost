@@ -2,7 +2,9 @@
 
 Stdio **MCP server** for [Model Context Protocol](https://modelcontextprotocol.io) clients (**Cursor**, **Goose**, etc.): validate Markdown locally, then **sign and POST** drafts to an EmDash site running [`@emplugins/emdash-plugin-md-draft`](../emdash-plugin-md-draft).
 
-Use with **EmDash 0.9.x+** and **`@emplugins/emdash-plugin-md-draft`** peer **`emdash >=0.9.0`** on the site.
+Use with **EmDash 0.14.x+** and **`@emplugins/emdash-plugin-md-draft`** peer **`emdash >=0.14.0`** on the site.
+
+Frontmatter may include optional **`locale`** and **`translationOf`** (source entry id) for multilingual sites; see the [operator runbook](../../docs/operator-runbook.md).
 
 ## Tools
 

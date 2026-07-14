@@ -8,7 +8,7 @@ EmDash **native** plugin that exposes authenticated HTTP routes to create **`pos
 pnpm add @emplugins/emdash-plugin-md-draft
 ```
 
-Peer: **`emdash` `>=0.9.0`**.
+Peer: **`emdash` `>=0.14.0`**.
 
 ## Register (Astro)
 
@@ -49,6 +49,20 @@ EmDash’s plugin host parses the request as **JSON** before your handler runs. 
 ```
 
 The MCP server uses the same canonical JSON bytes for **HMAC** signing as the plugin verifies.
+
+### Optional i18n frontmatter
+
+On sites with i18n enabled, you may set:
+
+```yaml
+---
+title: "Bonjour"
+locale: fr
+translationOf: 01JXXXXXXXXXXXXXXX
+---
+```
+
+`translationOf` requires `locale`. Slug collision checks are scoped to the given locale.
 
 ## Next steps
 

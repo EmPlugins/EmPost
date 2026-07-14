@@ -30,7 +30,7 @@ server.registerTool(
 	"ingest_markdown",
 	{
 		description:
-			"Create a draft post in EmDash from a full Markdown document (optional YAML frontmatter). Requires EMDASH_INGEST_URL, EMDASH_HMAC_SECRET, EMDASH_KEY_ID.",
+			"Create a draft post in EmDash from a full Markdown document (optional YAML frontmatter: title, slug, locale, translationOf for i18n). Requires EMDASH_INGEST_URL, EMDASH_HMAC_SECRET, EMDASH_KEY_ID.",
 		inputSchema: {
 			markdown: z.string().min(1).describe("Full markdown including optional --- frontmatter"),
 			idempotencyKey: z.string().optional().describe("Optional Idempotency-Key header for safe retries"),
@@ -53,7 +53,8 @@ server.registerTool(
 server.registerTool(
 	"ingest_path",
 	{
-		description: "Read a Markdown file from disk and ingest it as a draft (same as ingest_markdown).",
+		description:
+			"Read a Markdown file from disk and ingest it as a draft (same as ingest_markdown; supports locale / translationOf in frontmatter).",
 		inputSchema: {
 			path: z.string().min(1).describe("Absolute or relative path to a .md file"),
 			idempotencyKey: z.string().optional(),
@@ -94,7 +95,8 @@ server.registerTool(
 server.registerTool(
 	"validate_markdown",
 	{
-		description: "Validate frontmatter and markdown locally without writing to EmDash.",
+		description:
+			"Validate frontmatter and markdown locally without writing to EmDash (including optional locale and translationOf).",
 		inputSchema: {
 			markdown: z.string().min(1),
 		},
@@ -106,6 +108,8 @@ server.registerTool(
 				valid: true,
 				title: doc.frontmatter.title,
 				collection: doc.frontmatter.collection,
+				...(doc.frontmatter.locale ? { locale: doc.frontmatter.locale } : {}),
+				...(doc.frontmatter.translationOf ? { translationOf: doc.frontmatter.translationOf } : {}),
 				bodyPreview: doc.body.slice(0, 200),
 			});
 		} catch (e) {
