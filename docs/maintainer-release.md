@@ -43,32 +43,16 @@ Or store keyring credentials explicitly: `echo "$GITHUB_TOKEN" | gh auth login -
 - **CI publish** uses `NPM_TOKEN` (automation/granular with bypass) — no OTP.
 - **Local publish** (`pnpm release:publish`) prompts for OTP when your npm account has 2FA. Prefer CI for routine releases.
 
-### `NPM_TOKEN` 404 on publish
+### `NPM_TOKEN` 404 or EOTP on publish
 
-If Release workflow fails with:
+See [docs/NPM_ORG_PUBLISH.md](./NPM_ORG_PUBLISH.md) (aligned with [EmPrivacy](https://github.com/EmPlugins/EmPrivacy/blob/main/docs/NPM_ORG_PUBLISH.md)).
 
-```text
-npm error code E404
-npm error 404 Not Found - PUT https://registry.npmjs.org/@emplugins%2f...
-```
+| Error | Meaning |
+|-------|---------|
+| `E404` on PUT | Token lacks publish scope — use **All packages** write on granular token |
+| `EOTP` | Token requires interactive 2FA — enable **Bypass 2FA for automation** |
 
-The token in GitHub **Actions secrets** cannot publish to `@emplugins/*` (npm often returns 404 instead of 403).
-
-**Fix:**
-
-1. npmjs.com → Access Tokens → create **Granular Access Token** or **Classic Automation** token
-2. Permissions: **Read and write** for `@emplugins` org packages
-3. Enable **bypass 2FA for automation** (granular tokens)
-4. Update repo secret: `gh secret set NPM_TOKEN --repo EmPlugins/EmPost`
-5. Re-run Release workflow: Actions → Release → Run workflow
-
-Verify locally (as an org member with publish rights):
-
-```bash
-npm access list packages @emplugins
-```
-
-Should show `read-write` for each publishable package.
+Publish uses `scripts/npm-auth-publish.mjs` (explicit `.npmrc` + `npm publish` per package).
 
 ## Release workflow details
 
