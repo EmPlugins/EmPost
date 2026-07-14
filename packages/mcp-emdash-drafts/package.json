@@ -1,6 +1,6 @@
 {
   "name": "@emplugins/mcp-emdash-drafts",
-  "version": "0.3.0",
+  "version": "2.0.0",
   "description": "MCP server: ingest Markdown drafts into EmDash via EmPost plugin",
   "type": "module",
   "license": "MIT",
