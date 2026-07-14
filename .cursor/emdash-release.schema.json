@@ -55,6 +55,33 @@
       },
       "description": "npm packages included in compat changesets (must match .changeset/config.json linked/fixed groups)."
     },
+    "publish": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "packageDirs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "Workspace paths passed to npm-auth-publish.mjs (one package.json per dir)."
+        },
+        "githubRelease": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "tagPrefix": {
+              "type": "string",
+              "default": "v",
+              "description": "GitHub Release tag prefix before semver (e.g. v2.0.0)."
+            },
+            "notesFromChangelog": {
+              "type": "string",
+              "description": "CHANGELOG path for create-github-release.mjs recovery."
+            }
+          }
+        }
+      }
+    },
     "paths": {
       "type": "object",
       "additionalProperties": false,

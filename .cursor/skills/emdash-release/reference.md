@@ -1,48 +1,59 @@
 # EmDash release — reference
 
+Config: [`.cursor/emdash-release.json`](../../emdash-release.json)  
+Schema: [`.cursor/emdash-release.schema.json`](../../emdash-release.schema.json)
+
 ## Credentials
 
 | Credential | Where | Used for |
 |------------|-------|----------|
-| **GitHub CLI** (`gh auth login`) | Your machine | Branch, PR, CI polling, auto-merge compatibility PR |
-| **`NPM_TOKEN`** | GitHub repo secret on `EmPlugins/EmPost` | `release.yml` npm publish (after you merge Version Packages PR) |
-| **`GITHUB_TOKEN`** | Automatic in Actions | Version PR creation, changelog, GitHub Release |
+| **GitHub CLI** (`gh auth login`) | Your machine | Branch, PR, CI polling, `release:github`, `release:verify` |
+| **`NPM_TOKEN`** | GitHub repo secret | `release.yml` npm publish |
+| **`GITHUB_TOKEN`** | Automatic in Actions | Version PR creation, changelog, GitHub Release (happy path) |
 
-**Not required:** local npm token for routine releases (CI uses `NPM_TOKEN`). EmDash site HMAC secrets are only for optional post-publish smoke.
+### npm token (CI)
 
-### GitHub CLI and `GITHUB_TOKEN` env var
+Granular Access Token with:
 
-If `gh auth login` says `GITHUB_TOKEN` is in use, prefix commands:
+- **Read and write**
+- **All packages** scope (avoids `E404` on publish)
+- **Bypass 2FA** (avoids `EOTP` in CI)
+
+Setup: [docs/NPM_ORG_PUBLISH.md](../../../docs/NPM_ORG_PUBLISH.md)
+
+### GitHub CLI
 
 ```bash
 env -u GITHUB_TOKEN gh auth status
 env -u GITHUB_TOKEN gh pr create ...
 ```
 
-### One-time npm token setup
+## Release scripts
 
-1. npmjs.com → Access Tokens → Granular Access Token (or automation token)
-2. Publish scope: `@emplugins/emdash-plugin-md-draft`, `@emplugins/mcp-emdash-drafts`
-3. Add as GitHub secret `NPM_TOKEN` on `EmPlugins/EmPost`
+| Command | Purpose |
+|---------|---------|
+| `pnpm release:publish` | build, test, pack:check, `npm-auth-publish.mjs` |
+| `pnpm release:verify` | npm versions + GitHub Release tag vs `package.json` |
+| `pnpm release:github` | Create missing GitHub Release from CHANGELOG |
 
-### Auto-merge prerequisites
+Publish dirs and changelog path: `.cursor/emdash-release.json` → `publish`.
 
-Your GitHub user needs write + merge on `EmPlugins/EmPost`. Branch protection may block auto-merge — report the PR URL if merge fails.
+`npm-auth-publish.mjs` treats npm `E403` “already published” as success (idempotent re-runs).
 
 ## Files touched on every EmDash release
 
 | File | What changes |
 |------|--------------|
-| `packages/emdash-plugin-md-draft/package.json` | `devDependencies.emdash`, possibly `peerDependencies.emdash` |
+| `emdash.pluginPackageJson` | `devDependencies.emdash`, possibly peer |
 | `pnpm-lock.yaml` | lockfile after `pnpm install` |
-| `.github/workflows/ci.yml` | latest `emdash_version` matrix cell |
-| `EMDASH_COMPAT.md` | CI-tested latest version |
-| `README.md` | compatibility paragraph |
-| `.changeset/<slug>.md` | new changeset for linked packages |
+| `paths.ciWorkflow` | latest `emdash_version` matrix cell |
+| `paths.compatDoc` | CI-tested latest version |
+| `paths.readme` | compatibility paragraph |
+| `.changeset/<slug>.md` | new changeset for `publishablePackages` |
 
-## API touchpoints (likely break on upstream releases)
+## API touchpoints
 
-Primary sources:
+See `apiTouchpoints` in `.cursor/emdash-release.json`:
 
 - `packages/emdash-plugin-md-draft/src/plugin.ts`
 - `packages/emdash-plugin-md-draft/src/map-content-create-error.ts`
@@ -50,59 +61,57 @@ Primary sources:
 
 | API / pattern | Notes |
 |---------------|-------|
-| `definePlugin`, `PluginRouteError`, `PluginDescriptor` | imports from `"emdash"` |
-| `capabilities: ["content:write"]` | replaced deprecated `write:content` at 0.9.x |
-| `ctx.content.create` | structured error codes: `VALIDATION_ERROR`, `SLUG_CONFLICT`, `CONFLICT`, `NOT_FOUND` |
+| `definePlugin`, `PluginRouteError` | imports from `"emdash"` |
+| `capabilities: ["content:write"]` | replaced `write:content` at 0.9.x |
+| `ctx.content.create` | structured error codes |
 | `ctx.content.list` | optional `where: { locale }` (0.14.x i18n) |
-| `ctx.kv.set` TTL options | `ttlMs`, `expirationTtlMs`, `expireInMs`, `expiresInMs` — best-effort in `kvSetBestEffort()` |
-| `ctx.input` | JSON body pre-parsed by EmDash host; ingest expects `{ "markdown": "..." }` |
-| `emdash/astro` registration | consumer-facing; check examples if Astro integration API changes |
+| `ctx.kv.set` TTL options | best-effort in `kvSetBestEffort()` |
+| `ctx.input` | JSON body `{ "markdown": "..." }` |
 
-## Conformance script
+## Conformance
 
 ```bash
-pnpm emdash:conformance          # uses npm latest
+pnpm emdash:conformance          # reads .cursor/emdash-release.json via jq
 pnpm emdash:conformance 1.2.3   # test a specific version
 ```
 
-Runs build, test, and pack:check at minimum peer `0.14.0` and the target latest version. Mirrors `.github/workflows/ci.yml` matrix locally.
-
 ## Changeset policy
 
-Publishable packages are **linked** in `.changeset/config.json`:
-
-- `@emplugins/emdash-plugin-md-draft`
-- `@emplugins/mcp-emdash-drafts`
-
-Both get the same semver bump on each release. `@emplugins/shared` is private — do not include unless shared internals changed in a release-worthy way.
+Linked packages in `.changeset/config.json` — same semver bump. Highest pending bump wins. Clear stale `.changeset/*.md` before compat-only releases.
 
 | Outcome | Bump |
 |---------|------|
-| Conforming (version bump only) | patch |
+| Conforming | patch |
 | API fixes, peer unchanged | minor |
 | Peer floor raised | major |
 
-**Multiple pending changesets combine.** The highest bump wins across all files in `.changeset/` at Version Packages time. Clear stale changesets before a compat-only release.
+## Publish outcomes
 
-## Release and publish
+### Happy path
 
-- Publish script: `pnpm release:publish` (root `package.json`) — used by `release.yml`
-- Do **not** use inline `&&` in `changesets/action` `publish:` — it misparses and breaks CI
-- CI pnpm: omit `version` on `pnpm/action-setup` when `packageManager` is set in `package.json`
+Version Packages merge → changesets consume + publish in one Release run → npm + GitHub Release `v*`.
 
-Full troubleshooting: [docs/maintainer-release.md](../../docs/maintainer-release.md)
+### Delayed publish (2.0.0 lesson)
 
-## Post-publish checklist
+Version Packages merged while `NPM_TOKEN` invalid. Versions on `main`, changesets consumed, npm empty. Later fix merges → Release logs “No changesets found”, publishes npm, **skips** GitHub Release.
 
-After the user merges the Version Packages PR, point them to `docs/release-checklist.md` for verification and optional smoke on a staging EmDash site.
+Recovery: `pnpm release:github` → `pnpm release:verify`.
 
-## Troubleshooting quick reference
+### Re-run after npm published
+
+Manual `workflow_dispatch` may fail E403. Check `pnpm release:verify` — do not assume red workflow = unpublished.
+
+## Troubleshooting
 
 | Symptom | Action |
 |---------|--------|
-| Version Packages PR not created | Org may block Actions PR creation; `gh pr create --head changeset-release/main` |
-| Publish workflow failed after Version merge | Check Actions logs; ensure `publish: pnpm release:publish`; merge minimal fix from `origin/main` |
-| Fix PR has merge conflicts | Branch was not from `origin/main` — recreate with `git checkout -b fix/... origin/main` |
-| `gh` 401 / bad credentials | `env -u GITHUB_TOKEN gh ...` |
-| Local publish asks for OTP | Use CI publish, or run `pnpm release:publish` interactively |
-| Unexpected major version bump | Stale major changeset was pending alongside patch |
+| Version Packages PR not created | `gh pr create --head changeset-release/main` |
+| `EOTP` / `E404` on publish | Fix `NPM_TOKEN` per NPM_ORG_PUBLISH.md |
+| npm OK, no GitHub Release | `pnpm release:github` |
+| Latest Release run red, E403 | npm likely done — `pnpm release:verify` |
+| Unexpected major bump | Stale major changeset pending |
+| Fix PR conflicts | Recreate from `origin/main` |
+
+Full guide: [docs/maintainer-release.md](../../../docs/maintainer-release.md)  
+Checklist: [docs/release-checklist.md](../../../docs/release-checklist.md)  
+Semver policy: [docs/RELEASES.md](../../../docs/RELEASES.md)

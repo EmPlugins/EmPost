@@ -13,6 +13,16 @@
     "@emplugins/emdash-plugin-md-draft",
     "@emplugins/mcp-emdash-drafts"
   ],
+  "publish": {
+    "packageDirs": [
+      "packages/emdash-plugin-md-draft",
+      "packages/mcp-emdash-drafts"
+    ],
+    "githubRelease": {
+      "tagPrefix": "v",
+      "notesFromChangelog": "packages/emdash-plugin-md-draft/CHANGELOG.md"
+    }
+  },
   "paths": {
     "compatDoc": "EMDASH_COMPAT.md",
     "readme": "README.md",

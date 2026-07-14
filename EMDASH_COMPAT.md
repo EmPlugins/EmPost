@@ -23,7 +23,7 @@ Run **`update to latest emdash release`** in Cursor (loads `.cursor/skills/emdas
 3. Opens a compatibility PR and **auto-merges** when CI is green.
 4. **Stops** at the Changesets **Version Packages** PR — you merge that PR to publish to npm.
 
-See [docs/maintainer-release.md](docs/maintainer-release.md) for troubleshooting (manual Version PR, publish failures, changeset hygiene).
+See [docs/maintainer-release.md](docs/maintainer-release.md) and [docs/RELEASES.md](docs/RELEASES.md) for troubleshooting (manual Version PR, delayed publish, verify commands).
 
 ### Credentials (one-time)
 
@@ -43,6 +43,9 @@ See `.cursor/skills/emdash-release/reference.md` and `docs/maintainer-release.md
 | Org blocked Actions from creating Version Packages PR | Enable in org settings, or `gh pr create --head changeset-release/main` |
 | `pnpm/action-setup version: 9` conflicted with `packageManager` | Omit `version`; let `packageManager` pin pnpm |
 | Local `gh` used invalid `GITHUB_TOKEN` env var | `env -u GITHUB_TOKEN gh ...` |
+| `NPM_TOKEN` passed `whoami` but publish failed `EOTP` | Granular token with **Bypass 2FA** + **All packages** — [NPM_ORG_PUBLISH.md](docs/NPM_ORG_PUBLISH.md) |
+| Version Packages merged, npm failed; later fix merged → npm OK, no GitHub Release | `pnpm release:verify` then `pnpm release:github` — [maintainer-release.md](docs/maintainer-release.md) |
+| Manual Release re-run failed `E403` already published | npm already done; `pnpm release:verify` |
 | Local `npm publish` required OTP | Prefer CI publish via `NPM_TOKEN` |
 | Fix PR branched from diverged local `main` → conflicts | Branch fixes from `origin/main` only |
 

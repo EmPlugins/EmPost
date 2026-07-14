@@ -35,7 +35,7 @@ Add the MCP server to Cursor or Goose with env vars `EMDASH_INGEST_URL`, `EMDASH
 ## Repo layout
 
 - [`emPost.md`](./emPost.md) — full v1 specification
-- [`docs/`](./docs/) — threat model, runbook, client setup, [maintainer release guide](./docs/maintainer-release.md)
+- [`docs/`](./docs/) — threat model, runbook, client setup, [releases](./docs/RELEASES.md), [maintainer release guide](./docs/maintainer-release.md)
 - [`examples/`](./examples/) — sample post + config snippets
 
 ## Compatibility
