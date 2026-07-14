@@ -1,5 +1,17 @@
 # @emplugins/mcp-emdash-drafts
 
+## 2.0.0
+
+### Minor Changes
+
+- 25df0d1: EmDash **0.14.x** support: peer `emdash >=0.14.0`, optional i18n frontmatter (`locale`, `translationOf`) on ingest. MCP: tool descriptions and validate output for locale fields.
+
+### Patch Changes
+
+- 25df0d1: Test against EmDash 0.29.0. CI matrix and dev dependency updated; peer range unchanged (`>=0.14.0`).
+- Updated dependencies [25df0d1]
+  - @emplugins/shared@0.3.0
+
 ## 0.3.0
 
 ### Minor Changes
