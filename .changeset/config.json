@@ -3,7 +3,9 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
-  "linked": [],
+  "linked": [
+    ["@emplugins/emdash-plugin-md-draft", "@emplugins/mcp-emdash-drafts"]
+  ],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch"

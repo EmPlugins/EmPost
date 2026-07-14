@@ -44,7 +44,7 @@
     "@emplugins/shared": "workspace:*"
   },
   "devDependencies": {
-    "emdash": "^0.14.0",
+    "emdash": "^0.29.0",
     "tsup": "^8.3.5",
     "typescript": "^5.7.3",
     "vitest": "^3.0.4"

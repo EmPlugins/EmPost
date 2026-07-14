@@ -1,6 +1,6 @@
 # Changesets
 
-Publishable packages in this monorepo:
+Publishable packages in this monorepo ( **linked** — same semver on each release):
 
 - `@emplugins/emdash-plugin-md-draft`
 - `@emplugins/mcp-emdash-drafts`
@@ -9,9 +9,10 @@ Publishable packages in this monorepo:
 
 ## Release flow
 
-1. `pnpm changeset` — describe changes and bump type per package.
-2. Merge the changeset + version PR.
-3. `pnpm changeset version` then `pnpm build` / `pnpm test`.
-4. `pnpm publish -r --access public` from a clean checkout with npm auth for the `@emplugins` scope.
+1. `pnpm changeset` — describe changes and bump type on a PR.
+2. Merge to `main` — GitHub Actions opens a **Version Packages** PR (or publishes when that PR merges).
+3. Merge the Version Packages PR — CI publishes to npm and creates GitHub Releases.
 
-Update [docs/release-checklist.md](../docs/release-checklist.md) before tagging.
+Requires **`NPM_TOKEN`** on the repo (publish rights for `@emplugins/*`).
+
+See [docs/maintainer-release.md](../docs/maintainer-release.md) and [EMDASH_COMPAT.md](../EMDASH_COMPAT.md).
