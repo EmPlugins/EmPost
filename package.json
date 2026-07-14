@@ -8,7 +8,9 @@
     "lint": "pnpm -r run lint",
     "pack:check": "cd packages/emdash-plugin-md-draft && npm pack --dry-run && cd ../mcp-emdash-drafts && npm pack --dry-run",
     "emdash:conformance": "bash scripts/emdash-conformance.sh",
-    "release:publish": "pnpm build && pnpm test && pnpm pack:check && node scripts/npm-auth-publish.mjs"
+    "release:publish": "pnpm build && pnpm test && pnpm pack:check && node scripts/npm-auth-publish.mjs",
+    "release:verify": "node scripts/verify-release.mjs",
+    "release:github": "node scripts/create-github-release.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.11",

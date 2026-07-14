@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 /**
  * Publish monorepo packages with an explicit project .npmrc from NPM_TOKEN / NODE_AUTH_TOKEN.
- * Avoids pnpm/changesets auth gaps (EOTP / 404) in CI.
+ * Treats "already published" (npm E403) as success so Release re-runs are idempotent.
  */
 import { readFileSync, writeFileSync, unlinkSync, existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
+import { loadEmdashReleaseConfig, readPackageVersion } from "./lib/emdash-release-config.mjs";
+
+const ALREADY_PUBLISHED = /cannot publish over the previously published versions/i;
 
 const token = process.env.NPM_TOKEN || process.env.NODE_AUTH_TOKEN;
 if (!token) {
@@ -13,11 +16,7 @@ if (!token) {
 	process.exit(1);
 }
 
-const publishDirs = [
-	"packages/emdash-plugin-md-draft",
-	"packages/mcp-emdash-drafts",
-];
-
+const config = loadEmdashReleaseConfig();
 const npmrcPath = resolve(process.cwd(), ".npmrc");
 const contents = [
 	"registry=https://registry.npmjs.org/",
@@ -43,22 +42,36 @@ if (whoami.status !== 0) {
 }
 console.log(`npm whoami: ${whoami.stdout.trim()}`);
 
-for (const dir of publishDirs) {
-	const pkgPath = resolve(process.cwd(), dir, "package.json");
-	const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
+let published = 0;
+let skipped = 0;
+
+for (const dir of config.publishPackageDirs) {
+	const pkg = readPackageVersion(dir);
 	console.log(`Publishing ${pkg.name}@${pkg.version} from ${dir}`);
 
 	const publish = spawnSync(
 		"npm",
 		["publish", "--access", "public", "--registry", "https://registry.npmjs.org/"],
-		{ cwd: resolve(process.cwd(), dir), env, encoding: "utf8", stdio: "inherit" },
+		{ cwd: resolve(process.cwd(), dir), env, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
 	);
 
-	if (publish.status !== 0) {
-		if (existsSync(npmrcPath)) unlinkSync(npmrcPath);
-		process.exit(publish.status ?? 1);
+	if (publish.status === 0) {
+		published += 1;
+		console.log(publish.stdout || `+ ${pkg.name}@${pkg.version}`);
+		continue;
 	}
+
+	const err = `${publish.stderr || ""}\n${publish.stdout || ""}`;
+	if (ALREADY_PUBLISHED.test(err)) {
+		skipped += 1;
+		console.log(`Already published ${pkg.name}@${pkg.version}, skipping.`);
+		continue;
+	}
+
+	console.error(err.trim());
+	if (existsSync(npmrcPath)) unlinkSync(npmrcPath);
+	process.exit(publish.status ?? 1);
 }
 
 if (existsSync(npmrcPath)) unlinkSync(npmrcPath);
-console.log("Published all packages.");
+console.log(`Done. Published ${published}, skipped ${skipped} (already on npm).`);

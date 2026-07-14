@@ -10,16 +10,29 @@ Use before merging the **Version Packages** PR and after npm publish.
 - [ ] `pnpm pack:check` shows only intended files in tarballs.
 - [ ] README compatibility note: **EmDash 0.14.x+** (`emdash >=0.14.0`); ingest body is JSON `{ "markdown" }` (see operator runbook).
 - [ ] `@emplugins/emdash-plugin-md-draft` peer range for `emdash` still correct.
-- [ ] `NPM_TOKEN` repo secret is set (automation/granular token with 2FA bypass).
+- [ ] `NPM_TOKEN` repo secret is set (granular token: **All packages** write + **Bypass 2FA**). See [NPM_ORG_PUBLISH.md](./NPM_ORG_PUBLISH.md).
 
 ## After merge (publish verification)
 
-- [ ] [Release workflow](https://github.com/EmPlugins/EmPost/actions/workflows/release.yml) completed successfully.
+Run:
+
+```bash
+pnpm release:verify
+```
+
+Checklist:
+
+- [ ] [Release workflow](https://github.com/EmPlugins/EmPost/actions/workflows/release.yml) — if the **latest** run is red, check whether an **earlier** run on the same merge already published (E403 “already published” on re-run is OK).
 - [ ] `npm view @emplugins/emdash-plugin-md-draft version` shows the new version.
 - [ ] `npm view @emplugins/mcp-emdash-drafts version` shows the same linked version.
-- [ ] GitHub Release created (if `createGithubReleases` is enabled).
+- [ ] GitHub Release `v<version>` exists.
 
-If publish failed, see [maintainer-release.md](./maintainer-release.md) troubleshooting.
+If npm is correct but GitHub Release is missing (delayed publish — see [maintainer-release.md](./maintainer-release.md)):
+
+```bash
+pnpm release:github
+pnpm release:verify
+```
 
 ## Optional smoke (staging)
 
