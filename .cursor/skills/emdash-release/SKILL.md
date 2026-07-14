@@ -10,7 +10,9 @@ description: >-
 
 # EmDash release workflow
 
-Execute every step below. Do not only advise — run commands, edit files, open PRs, and merge when allowed.
+> **Prefer the personal skill:** `~/.cursor/skills/emdash-plugin-release/` reads [`.cursor/emdash-release.json`](../emdash-release.json). This project skill is a legacy copy; keep in sync or remove once the personal skill is verified.
+
+Execute every step below.
 
 ## Prerequisites
 

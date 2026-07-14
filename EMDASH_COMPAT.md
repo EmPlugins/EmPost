@@ -16,7 +16,9 @@ Publishable packages are **version-linked** via Changesets (same semver on each 
 
 ## Agent-driven upgrade
 
-Run **`update to latest emdash release`** in Cursor (loads `.cursor/skills/emdash-release`). The agent:
+Per-repo config: [`.cursor/emdash-release.json`](.cursor/emdash-release.json). Personal skill: `~/.cursor/skills/emdash-plugin-release/` (works in any EmPlugins repo with that file).
+
+Run **`update to latest emdash release`** in Cursor.
 
 1. Discovers the latest `emdash` on npm and bumps dev dep, lockfile, CI matrix, and docs.
 2. Runs `pnpm emdash:conformance` (min `0.14.0` + latest).
@@ -32,7 +34,7 @@ See [docs/maintainer-release.md](docs/maintainer-release.md) for troubleshooting
 | `gh auth login` | Your machine (branch, PR, auto-merge compat PR) |
 | `NPM_TOKEN` | GitHub repo secret on `EmPlugins/EmPost` (npm publish via `release.yml`) |
 
-See `.cursor/skills/emdash-release/reference.md` and `docs/maintainer-release.md` for full details.
+See `.cursor/emdash-release.json`, `~/.cursor/skills/emdash-plugin-release/bootstrap.md`, and `docs/maintainer-release.md` for full details.
 
 ## Lessons learned (2026 emdash@0.29.0 release)
 
