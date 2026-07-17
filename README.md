@@ -120,7 +120,15 @@ The docs below describe the original EmPost design. They are **not updated** and
 | `@emplugins/emdash-plugin-md-draft` | EmDash plugin: signed ingest + health |
 | `@emplugins/mcp-emdash-drafts` | MCP stdio server: `ingest_path`, `ingest_markdown`, `validate_markdown` |
 
----
+## Repo layout
+
+- [`emPost.md`](./emPost.md) — full v1 specification
+- [`docs/`](./docs/) — threat model, runbook, client setup, [releases](./docs/RELEASES.md), [maintainer release guide](./docs/maintainer-release.md)
+- [`examples/`](./examples/) — sample post + config snippets
+
+## Compatibility
+
+Tested against **EmDash `0.14.0` and `0.29.0`** (`emdash` peer **`>=0.14.0`** on `@emplugins/emdash-plugin-md-draft`). See [EMDASH_COMPAT.md](./EMDASH_COMPAT.md). Ingest uses `POST` with `Content-Type: application/json` and `{ "markdown": "..." }` because EmDash’s plugin route host parses JSON before the handler runs (see [`docs/operator-runbook.md`](./docs/operator-runbook.md)). Multi-locale sites may set optional YAML `locale` and `translationOf` in the markdown frontmatter.
 
 ## License
 
