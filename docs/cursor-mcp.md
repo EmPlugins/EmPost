@@ -1,5 +1,7 @@
 # Cursor MCP setup
 
+> **Deprecated.** EmPost is no longer maintained. Use [EmDash’s built-in MCP](https://docs.emdashcms.com/guides/ai-tools/) instead — see the [migration guide](../README.md#migration-to-emdash-mcp).
+
 ## 1. Install the server (optional local pin)
 
 Use `npx` so you do not need a global install:

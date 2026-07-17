@@ -1,5 +1,7 @@
 # Goose MCP setup
 
+> **Deprecated.** EmPost is no longer maintained. Use [EmDash’s built-in MCP](https://docs.emdashcms.com/guides/ai-tools/) instead — see the [migration guide](../README.md#migration-to-emdash-mcp).
+
 Goose can run the same stdio MCP server as Cursor. Configure a server that launches `npx` with the EmPost package and the same environment variables.
 
 ## Example (YAML)

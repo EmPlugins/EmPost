@@ -1,10 +1,39 @@
 # `@emplugins/mcp-emdash-drafts`
 
-Stdio **MCP server** for [Model Context Protocol](https://modelcontextprotocol.io) clients (**Cursor**, **Goose**, etc.): validate Markdown locally, then **sign and POST** drafts to an EmDash site running [`@emplugins/emdash-plugin-md-draft`](../emdash-plugin-md-draft).
+> **Deprecated — unmaintained.** This package is no longer supported. Connect agents directly to [EmDash’s built-in MCP server](https://docs.emdashcms.com/guides/ai-tools/) instead.  
+> Migration guide: [EmPost README — Migration to EmDash MCP](https://github.com/EmPlugins/EmPost#migration-to-emdash-mcp)
 
-Use with **EmDash 0.14.x+** and **`@emplugins/emdash-plugin-md-draft`** peer **`emdash >=0.14.0`** on the site.
+---
 
-Frontmatter may include optional **`locale`** and **`translationOf`** (source entry id) for multilingual sites; see the [operator runbook](../../docs/operator-runbook.md).
+Stdio **MCP server** for [Model Context Protocol](https://modelcontextprotocol.io) clients (**Cursor**, **Goose**, etc.): validated Markdown locally, then signed and POSTed drafts to an EmDash site running `@emplugins/emdash-plugin-md-draft`.
+
+**Do not add this MCP server to new configs.** Remove it from existing agent setups.
+
+## Replacement
+
+Remove this stdio server and point your MCP client at EmDash’s HTTP MCP endpoint with a Personal Access Token:
+
+```json
+{
+  "mcpServers": {
+    "emdash": {
+      "url": "https://YOUR_SITE/_emdash/api/mcp",
+      "headers": {
+        "Authorization": "Bearer ec_pat_YOUR_TOKEN"
+      }
+    }
+  }
+}
+```
+
+Documentation: [AI Tools](https://docs.emdashcms.com/guides/ai-tools/) · [MCP Server Reference](https://docs.emdashcms.com/reference/mcp-server/)
+
+Also remove `@emplugins/emdash-plugin-md-draft` from your EmDash site if installed.
+
+---
+
+<details>
+<summary>Original documentation (archived)</summary>
 
 ## Tools
 
@@ -18,18 +47,14 @@ Frontmatter may include optional **`locale`** and **`translationOf`** (source en
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `EMDASH_INGEST_URL` | Yes | Full URL to ingest, e.g. `https://example.com/_emdash/api/plugins/empost-md-draft/ingest` |
+| `EMDASH_INGEST_URL` | Yes | Full URL to ingest |
 | `EMDASH_HMAC_SECRET` | Yes | Same secret configured in EmDash plugin admin |
-| `EMDASH_KEY_ID` | No | Defaults to `default`; must match plugin **Expected key id** |
+| `EMDASH_KEY_ID` | No | Defaults to `default` |
 
-## Run (CLI / `npx`)
+## Run
 
 ```bash
 npx -y @emplugins/mcp-emdash-drafts
 ```
 
-The process speaks MCP on stdio — configure your client to launch this command with the env vars above.
-
-## Client snippets
-
-See [examples/mcp.cursor.json](../../examples/mcp.cursor.json) and [examples/mcp.goose.yaml](../../examples/mcp.goose.yaml).
+</details>

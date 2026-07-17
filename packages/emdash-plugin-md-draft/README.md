@@ -1,16 +1,38 @@
 # `@emplugins/emdash-plugin-md-draft`
 
-EmDash **native** plugin that exposes authenticated HTTP routes to create **`posts` drafts** from Markdown (via the `@emplugins/mcp-emdash-drafts` MCP server or any HMAC-aware client).
+> **Deprecated — unmaintained.** This package is no longer supported. Use [EmDash’s built-in MCP server](https://docs.emdashcms.com/guides/ai-tools/) instead.  
+> Migration guide: [EmPost README — Migration to EmDash MCP](https://github.com/EmPlugins/EmPost#migration-to-emdash-mcp)
 
-## Install
+---
 
-```bash
-pnpm add @emplugins/emdash-plugin-md-draft
+EmDash **native** plugin that exposed authenticated HTTP routes to create **`posts` drafts** from Markdown (via the `@emplugins/mcp-emdash-drafts` MCP server or any HMAC-aware client).
+
+**Do not install on new sites.** Remove this plugin if it is already installed.
+
+## Uninstall
+
+1. Remove `empostMdDraftPlugin()` from `astro.config.mjs` (`emdash({ plugins: [...] })`).
+2. Run `pnpm remove @emplugins/emdash-plugin-md-draft` (or your package manager equivalent).
+3. Redeploy.
+
+## Replacement
+
+Connect AI tools to your site’s built-in MCP endpoint:
+
 ```
+https://YOUR_SITE/_emdash/api/mcp
+```
+
+Documentation: [AI Tools](https://docs.emdashcms.com/guides/ai-tools/) · [MCP Server Reference](https://docs.emdashcms.com/reference/mcp-server/)
+
+---
+
+<details>
+<summary>Original documentation (archived)</summary>
 
 Peer: **`emdash` `>=0.14.0`**.
 
-## Register (Astro)
+### Register (Astro)
 
 ```ts
 import { defineConfig } from "astro/config";
@@ -26,45 +48,18 @@ export default defineConfig({
 });
 ```
 
-This package uses **`format: "native"`** so it can ship an admin **settings schema** (HMAC secret, quotas, payload limits). Native plugins must be listed under `plugins: []` (not `sandboxed: []`).
+This package used **`format: "native"`** so it could ship an admin **settings schema** (HMAC secret, quotas, payload limits). Native plugins had to be listed under `plugins: []` (not `sandboxed: []`).
 
-## HTTP routes
+### HTTP routes
 
 | Route key | Method | Purpose |
 |-----------|--------|---------|
 | `health` | GET | Liveness (`public`) |
 | `ingest` | POST | Create draft (`public`, HMAC-gated) |
 
-Typical URLs (no trailing slash required on your site base):
+Typical URLs:
 
 - `GET /_emdash/api/plugins/empost-md-draft/health`
 - `POST /_emdash/api/plugins/empost-md-draft/ingest`
 
-## Ingest contract
-
-EmDash’s plugin host parses the request as **JSON** before your handler runs. The body must be:
-
-```json
-{ "markdown": "---\ntitle: \"Hello\"\n---\n\n# Body\n" }
-```
-
-The MCP server uses the same canonical JSON bytes for **HMAC** signing as the plugin verifies.
-
-### Optional i18n frontmatter
-
-On sites with i18n enabled, you may set:
-
-```yaml
----
-title: "Bonjour"
-locale: fr
-translationOf: 01JXXXXXXXXXXXXXXX
----
-```
-
-`translationOf` requires `locale`. Slug collision checks are scoped to the given locale.
-
-## Next steps
-
-- [Operator runbook](../../docs/operator-runbook.md)
-- [Cursor MCP](../../docs/cursor-mcp.md) · [Goose MCP](../../docs/goose-mcp.md)
+</details>
