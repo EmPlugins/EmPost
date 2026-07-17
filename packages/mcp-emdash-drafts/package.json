@@ -1,7 +1,7 @@
 {
   "name": "@emplugins/mcp-emdash-drafts",
   "version": "2.0.0",
-  "description": "MCP server: ingest Markdown drafts into EmDash via EmPost plugin",
+  "description": "[DEPRECATED — unmaintained] MCP server for EmPost. Use EmDash built-in MCP at /_emdash/api/mcp instead.",
   "type": "module",
   "license": "MIT",
   "repository": {
